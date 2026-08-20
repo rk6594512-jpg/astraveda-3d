@@ -1,0 +1,91 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--no-audit --no-fund"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirect rules for SPA routing
+[[redirects]]
+  from = "/onboarding"
+  to = "/onboarding.html"
+  status = 200
+
+[[redirects]]
+  from = "/kundli/*"
+  to = "/kundli/[id].html"
+  status = 200
+
+[[redirects]]
+  from = "/palm-scan"
+  to = "/palm-scan.html"
+  status = 200
+
+[[redirects]]
+  from = "/ai-jyotishi"
+  to = "/ai-jyotishi.html"
+  status = 200
+
+[[redirects]]
+  from = "/panchang"
+  to = "/panchang.html"
+  status = 200
+
+[[redirects]]
+  from = "/matchmaking"
+  to = "/matchmaking.html"
+  status = 200
+
+[[redirects]]
+  from = "/muhurat"
+  to = "/muhurat.html"
+  status = 200
+
+[[redirects]]
+  from = "/reports/*"
+  to = "/reports/[id].html"
+  status = 200
+
+[[redirects]]
+  from = "/profile"
+  to = "/profile.html"
+  status = 200
+
+[[redirects]]
+  from = "/settings"
+  to = "/settings.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/disclaimer"
+  to = "/disclaimer.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-DNS-Prefetch-Control = "on"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"

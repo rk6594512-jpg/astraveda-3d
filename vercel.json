@@ -1,0 +1,32 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "rewrites": [
+    { "source": "/onboarding", "destination": "/onboarding" },
+    { "source": "/kundli/:id", "destination": "/kundli/[id]" },
+    { "source": "/palm-scan", "destination": "/palm-scan" },
+    { "source": "/ai-jyotishi", "destination": "/ai-jyotishi" },
+    { "source": "/panchang", "destination": "/panchang" },
+    { "source": "/matchmaking", "destination": "/matchmaking" },
+    { "source": "/muhurat", "destination": "/muhurat" },
+    { "source": "/reports/:id", "destination": "/reports/[id]" },
+    { "source": "/profile", "destination": "/profile" },
+    { "source": "/settings", "destination": "/settings" },
+    { "source": "/admin", "destination": "/admin" },
+    { "source": "/privacy", "destination": "/privacy" },
+    { "source": "/terms", "destination": "/terms" },
+    { "source": "/disclaimer", "destination": "/disclaimer" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "AstraVeda 3D — Vedic Astrology & Cosmic Guidance",
+  "short_name": "AstraVeda",
+  "description": "AI-powered Vedic astrology platform with interactive 3D birth charts, palm reading, and cosmic guidance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06070C",
+  "theme_color": "#06070C",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["lifestyle", "spirituality", "health"],
+  "lang": "en",
+  "dir": "ltr"
+}
