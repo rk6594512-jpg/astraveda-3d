@@ -1,135 +1,95 @@
-"use client"
+'use client';
 
-import React from "react"
-import { motion } from "framer-motion"
-import Link from "next/link"
-import { Orbit, Hand, MessageCircle, ArrowRight, Sparkles } from "lucide-react"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
-import Starfield from "@/components/hero/Starfield"
-import ZodiacWheel from "@/components/hero/ZodiacWheel"
-import CosmicStatus from "@/components/sections/CosmicStatus"
-import FeatureCards from "@/components/sections/FeatureCards"
-import HowItWorks from "@/components/sections/HowItWorks"
-import TrustSafety from "@/components/sections/TrustSafety"
-import FAQ from "@/components/sections/FAQ"
-import { Button } from "@/components/ui/button"
+import dynamic from 'next/dynamic';
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+import { CosmicStatus } from '@/components/sections/CosmicStatus';
+import { FeatureCards } from '@/components/sections/FeatureCards';
+import { HowItWorks } from '@/components/sections/HowItWorks';
+import { TrustSafety } from '@/components/sections/TrustSafety';
+import { FAQ } from '@/components/sections/FAQ';
+import Link from 'next/link';
+
+// 3D Canvas ko bina SSR ke dynamically load karein taaki crash na ho
+const Starfield = dynamic(
+  () => import('@/components/hero/Starfield').then((mod) => mod.Starfield),
+  { ssr: false }
+);
+
+const ZodiacWheel3D = dynamic(
+  () => import('@/components/hero/ZodiacWheel3D').then((mod) => mod.ZodiacWheel3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-32 h-32 rounded-full border-2 border-[#C89B3C]/30 border-t-[#F1CE73] animate-spin" />
+      </div>
+    ),
+  }
+);
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-[#06070C] text-[#F6F0E2] relative overflow-hidden selection:bg-[#C89B3C]/30">
+      {/* 3D Starfield Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <Starfield />
+      </div>
+
+      {/* Navigation */}
       <Navbar />
 
-      {/* HERO SECTION */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <Starfield />
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[500px] h-[500px] md:w-[700px] md:h-[700px] rounded-full bg-gradient-radial from-royal-violet/20 via-transparent to-transparent blur-3xl" />
+      {/* Hero Section */}
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-16 text-center max-w-7xl mx-auto">
+        {/* Glow Accent */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-[#38245E]/40 rounded-full blur-[100px] pointer-events-none" />
+
+        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-light tracking-tight text-white mb-6 max-w-4xl leading-tight">
+          Your Birth Holds a <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F1CE73] via-[#C89B3C] to-[#F1CE73]">Pattern</span>.
+        </h1>
+
+        <p className="text-base sm:text-xl text-[#AAA6BE] max-w-2xl mb-10 font-sans leading-relaxed">
+          Explore your kundli, palm energy, and cosmic guidance through an intelligent 3D experience.
+        </p>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-4 justify-center items-center mb-12">
+          <Link
+            href="/kundli"
+            className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#06070C] font-medium shadow-lg hover:shadow-[#C89B3C]/20 hover:scale-105 transition-all duration-300"
+          >
+            Create My Cosmic Blueprint
+          </Link>
+          <Link
+            href="/palm-scan"
+            className="px-8 py-3.5 rounded-full bg-[#17183B]/80 hover:bg-[#17183B] text-white border border-[#C89B3C]/30 backdrop-blur-md hover:scale-105 transition-all duration-300"
+          >
+            Scan My Palm
+          </Link>
+          <Link
+            href="/ai-jyotishi"
+            className="px-8 py-3.5 rounded-full bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-md transition-all duration-300"
+          >
+            Ask Astra AI
+          </Link>
         </div>
 
-        <div className="relative z-10 section-padding w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 pt-24 pb-16">
-          <motion.div
-            className="flex-1 max-w-xl text-center lg:text-left"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel mb-6">
-              <Sparkles className="h-3.5 w-3.5 text-gold-bright" />
-              <span className="text-xs font-medium text-gold-bright/90 tracking-wide">
-                AI-Powered Vedic Astrology
-              </span>
-            </div>
-
-            <h1 className="heading-hero mb-6">Your Birth Holds a Pattern.</h1>
-            <p className="body-large mb-8 max-w-md mx-auto lg:mx-0">
-              Explore your kundli, palm energy, and cosmic guidance through an intelligent 3D experience.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
-              <Button size="lg" className="w-full sm:w-auto" asChild>
-                <Link href="/onboarding" className="flex items-center gap-2">
-                  <Orbit className="h-4 w-4" />
-                  Create My Cosmic Blueprint
-                </Link>
-              </Button>
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto" asChild>
-                <Link href="/palm-scan" className="flex items-center gap-2">
-                  <Hand className="h-4 w-4" />
-                  Scan My Palm
-                </Link>
-              </Button>
-            </div>
-
-            <div className="mt-4">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/ai-jyotishi" className="flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  Ask Astra AI
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="flex-1 flex items-center justify-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-          >
-            <ZodiacWheel />
-          </motion.div>
+        {/* 3D Zodiac Wheel Hero Canvas */}
+        <div className="w-full max-w-lg aspect-square relative my-6">
+          <ZodiacWheel3D />
         </div>
-
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-        >
-          <span className="text-[10px] uppercase tracking-[0.2em] text-lavender/40">Scroll to explore</span>
-          <motion.div
-            className="w-5 h-8 rounded-full border border-lavender/20 flex items-start justify-center p-1.5"
-            animate={{ y: [0, 4, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="w-1 h-2 rounded-full bg-gold-antique/40" />
-          </motion.div>
-        </motion.div>
       </section>
 
-      <CosmicStatus />
-      <FeatureCards />
-      <HowItWorks />
-      <TrustSafety />
+      {/* Content Sections */}
+      <div className="relative z-10 space-y-24 pb-20">
+        <CosmicStatus />
+        <FeatureCards />
+        <HowItWorks />
+        <TrustSafety />
+        <FAQ />
+      </div>
 
-      <section className="section-padding py-16 md:py-24 relative">
-        <motion.div
-          className="max-w-3xl mx-auto text-center glass-panel rounded-2xl p-8 md:p-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="heading-section mb-4">Begin Your Cosmic Journey Today</h2>
-          <p className="body-large mb-8 max-w-xl mx-auto">
-            Your birth chart holds insights waiting to be discovered. Start with a free kundli and unlock deeper guidance as you explore.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
-            <Button size="xl" asChild>
-              <Link href="/onboarding">Create My Cosmic Blueprint</Link>
-            </Button>
-            <Button variant="secondary" size="xl" asChild>
-              <Link href="/ai-jyotishi">Talk to Astra AI</Link>
-            </Button>
-          </div>
-          <p className="text-xs text-lavender/40 mt-6">Free basic kundli. No credit card required.</p>
-        </motion.div>
-      </section>
-
-      <FAQ />
       <Footer />
     </main>
-  )
+  );
 }
