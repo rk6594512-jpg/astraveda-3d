@@ -2,36 +2,36 @@
 
 import React, { useState } from 'react';
 
-export default function TarunSpatialEngine() {
+export default function Tarun2030Portal() {
   const [activeTab, setActiveTab] = useState<'cosmos' | 'kundli' | 'palm' | 'oracle' | 'panchang'>('cosmos');
   
-  // Kundli State
+  // Kundli Matrix State
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
   const [tob, setTob] = useState('');
   const [pob, setPob] = useState('');
-  const [calculated, setCalculated] = useState(false);
+  const [chartReady, setChartReady] = useState(false);
 
-  // Palm Scanner State
+  // Palm Vision State
   const [scanning, setScanning] = useState(false);
-  const [scanned, setScanned] = useState(false);
+  const [scanDone, setScanDone] = useState(false);
 
-  // AI Oracle State
+  // Oracle AI State
   const [chatLog, setChatLog] = useState([
-    { role: 'ai', text: '✦ Tarun 2030 Neural Core active. Ask regarding planetary transits, career leverage windows, or karmic nodes.' }
+    { role: 'ai', text: '✦ Tarun 2030 Spatial Core Online. Ask anything about your planetary transits, career windows, or karmic nodes.' }
   ]);
   const [inputVal, setInputVal] = useState('');
 
-  const runPalmScan = () => {
+  const handlePalmScan = () => {
     setScanning(true);
-    setScanned(false);
+    setScanDone(false);
     setTimeout(() => {
       setScanning(false);
-      setScanned(true);
+      setScanDone(true);
     }, 2200);
   };
 
-  const sendOracleMsg = (e: React.FormEvent) => {
+  const handleSendOracle = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputVal.trim()) return;
     const msg = inputVal;
@@ -43,22 +43,22 @@ export default function TarunSpatialEngine() {
         ...prev,
         {
           role: 'ai',
-          text: `✦ Strategic Synthesis for "${msg}":\nPlanetary ephemeris highlights strong 10th-house activation. Aligning core focus with Jupiter transit will compound leverage.`
+          text: `✦ Spatial Synthesis for "${msg}":\nPlanetary ephemeris indicates active 10th-house expansion. Aligning strategic initiatives with the ongoing Jupiter cycle yields maximum leverage.`
         }
       ]);
     }, 600);
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#030408] text-[#F4EFE6] selection:bg-[#F1CE73]/30 overflow-x-hidden pb-16">
+    <div className="min-h-screen w-full bg-[#030408] text-[#F4EFE6] selection:bg-[#F1CE73]/30 overflow-x-hidden pb-16 font-sans">
       
-      {/* Dynamic Ambient Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-gradient-to-b from-[#4A1E8A]/30 via-[#C89B3C]/10 to-transparent blur-[120px] pointer-events-none -z-10" />
+      {/* Background Volumetric Aura */}
+      <div className="fixed top-[-10%] left-1/2 -translate-x-1/2 w-full max-w-[900px] h-[500px] bg-gradient-to-b from-[#4A1E8A]/35 via-[#C89B3C]/15 to-transparent blur-[140px] pointer-events-none -z-10" />
 
-      {/* Top Navbar */}
+      {/* Top Glass Navigation */}
       <header className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-5 flex flex-wrap items-center justify-between gap-4 border-b border-white/10">
         <div onClick={() => setActiveTab('cosmos')} className="flex items-center gap-3 cursor-pointer">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#C89B3C] via-[#F1CE73] to-white flex items-center justify-center text-[#030408] font-bold text-lg shadow-[0_0_20px_rgba(241,206,115,0.4)]">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#C89B3C] via-[#F1CE73] to-white flex items-center justify-center text-[#030408] font-bold text-lg shadow-[0_0_20px_rgba(241,206,115,0.45)]">
             ✦
           </div>
           <div>
@@ -69,7 +69,7 @@ export default function TarunSpatialEngine() {
           </div>
         </div>
 
-        {/* Tab Controls */}
+        {/* HUD Tab Controls */}
         <nav className="flex items-center gap-1.5 p-1 rounded-full bg-white/[0.04] border border-white/10 overflow-x-auto">
           {(['cosmos', 'kundli', 'palm', 'oracle', 'panchang'] as const).map((tab) => (
             <button
@@ -87,10 +87,10 @@ export default function TarunSpatialEngine() {
         </nav>
       </header>
 
-      {/* Viewport Content */}
+      {/* Dynamic Viewport Content */}
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8">
         
-        {/* TAB 1: 3D COSMOS HERO */}
+        {/* 1. 3D COSMOS HERO */}
         {activeTab === 'cosmos' && (
           <div className="flex flex-col items-center text-center pt-6 space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-[#C89B3C]/30 text-xs text-[#F1CE73]">
@@ -106,7 +106,7 @@ export default function TarunSpatialEngine() {
             </h1>
 
             <p className="text-sm sm:text-base text-[#8E8A9F] max-w-2xl leading-relaxed">
-              Vedic calculation matrix, neural biometric palm line tracing, and real-time Jyotishi reasoning engineered for leverage.
+              Autonomous Vedic calculation matrix, neural biometric palm line tracing, and real-time Jyotishi reasoning engineered for peak leverage.
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center items-center">
@@ -130,38 +130,38 @@ export default function TarunSpatialEngine() {
               </button>
             </div>
 
-            {/* Spatial Orbit Core */}
+            {/* 3D Orbit Centerpiece */}
             <div className="relative w-64 h-64 sm:w-80 sm:h-80 flex items-center justify-center my-6">
               <div className="absolute inset-0 rounded-full border border-[#C89B3C]/30 animate-[spin_50s_linear_infinite]" />
               <div className="absolute inset-6 rounded-full border border-[#F1CE73]/30 border-dashed animate-[spin_30s_linear_infinite_reverse]" />
-              <div className="absolute inset-12 rounded-full border border-white/10 shadow-[0_0_30px_rgba(200,155,60,0.15)]" />
+              <div className="absolute inset-12 rounded-full border border-white/10 shadow-[0_0_30px_rgba(200,155,60,0.2)]" />
               <div className="w-20 h-20 rounded-2xl bg-[#121324] border border-[#C89B3C]/50 flex items-center justify-center shadow-xl">
                 <span className="text-3xl text-[#F1CE73]">ॐ</span>
               </div>
             </div>
 
-            {/* Feature Cards Grid */}
+            {/* Feature Hologram Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-8 text-left">
               <div onClick={() => setActiveTab('kundli')} className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#C89B3C]/50 transition-all cursor-pointer">
                 <div className="text-3xl mb-3">🪐</div>
                 <h3 className="text-lg text-[#F1CE73] mb-1 font-semibold">Quantum D1 & D9 Engine</h3>
-                <p className="text-xs text-[#8E8A9F] leading-relaxed">Precision planetary ephemeris calculating lagna degrees and dashas.</p>
+                <p className="text-xs text-[#8E8A9F] leading-relaxed">Precision planetary ephemeris calculating lagna degrees, nakshatras, and mahadashas.</p>
               </div>
               <div onClick={() => setActiveTab('palm')} className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#C89B3C]/50 transition-all cursor-pointer">
                 <div className="text-3xl mb-3">✋</div>
                 <h3 className="text-lg text-[#F1CE73] mb-1 font-semibold">Neural Palm Scanning</h3>
-                <p className="text-xs text-[#8E8A9F] leading-relaxed">Vision-assisted line tracing of Life and Mount energy nodes.</p>
+                <p className="text-xs text-[#8E8A9F] leading-relaxed">Vision-assisted micro-line tracing of Life, Heart, and Mount nodes.</p>
               </div>
               <div onClick={() => setActiveTab('oracle')} className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#C89B3C]/50 transition-all cursor-pointer">
                 <div className="text-3xl mb-3">⚡</div>
                 <h3 className="text-lg text-[#F1CE73] mb-1 font-semibold">Tarun AI Oracle HUD</h3>
-                <p className="text-xs text-[#8E8A9F] leading-relaxed">Vedic conversational intelligence for timing windows and remedies.</p>
+                <p className="text-xs text-[#8E8A9F] leading-relaxed">Vedic conversational intelligence for timing windows and strategic remedies.</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: KUNDLI CALCULATOR */}
+        {/* 2. KUNDLI MATRIX */}
         {activeTab === 'kundli' && (
           <div className="space-y-6">
             <div className="text-center max-w-xl mx-auto">
@@ -169,7 +169,7 @@ export default function TarunSpatialEngine() {
               <p className="text-xs text-[#8E8A9F]">Compute high-precision astrological coordinates.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-              <form onSubmit={(e) => { e.preventDefault(); if(name) setCalculated(true); }} className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 space-y-4">
+              <form onSubmit={(e) => { e.preventDefault(); if(name) setChartReady(true); }} className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 space-y-4">
                 <h3 className="text-xs font-semibold text-[#F1CE73] tracking-widest uppercase">Enter Astro Telemetry</h3>
                 <div>
                   <label className="text-xs text-[#8E8A9F] block mb-1">Full Name</label>
@@ -222,7 +222,7 @@ export default function TarunSpatialEngine() {
               </form>
 
               <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 min-h-[350px] flex flex-col justify-center items-center">
-                {calculated ? (
+                {chartReady ? (
                   <div className="w-full space-y-4 text-center">
                     <h4 className="text-xl text-[#F1CE73]">{name}&apos;s Lagna Matrix</h4>
                     <p className="text-xs text-[#8E8A9F]">Lagna: Mesha (Aries) • Moon: Rohini Nakshatra</p>
@@ -249,7 +249,7 @@ export default function TarunSpatialEngine() {
           </div>
         )}
 
-        {/* TAB 3: NEURAL PALM SCANNER */}
+        {/* 3. PALM SCANNER */}
         {activeTab === 'palm' && (
           <div className="max-w-md mx-auto text-center space-y-6">
             <h2 className="text-3xl font-light text-white">Neural Palm Vision</h2>
@@ -261,13 +261,13 @@ export default function TarunSpatialEngine() {
                 )}
               </div>
               <button
-                onClick={runPalmScan}
+                onClick={handlePalmScan}
                 disabled={scanning}
                 className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#030408] font-bold shadow-md hover:opacity-95 transition-all"
               >
                 {scanning ? 'Analyzing Meridian Nodes...' : 'Initiate Biometric Scan'}
               </button>
-              {scanned && (
+              {scanDone && (
                 <div className="text-left bg-white/[0.05] p-4 rounded-xl border border-[#C89B3C]/30 text-xs space-y-2 mt-6">
                   <div className="text-[#F1CE73] font-bold text-sm">✨ Biometric Summary:</div>
                   <p className="text-[#8E8A9F]"><strong className="text-white">Life Meridian:</strong> Deep continuous curve — high vitality.</p>
@@ -278,7 +278,7 @@ export default function TarunSpatialEngine() {
           </div>
         )}
 
-        {/* TAB 4: TARUN AI ORACLE */}
+        {/* 4. AI ORACLE */}
         {activeTab === 'oracle' && (
           <div className="max-w-2xl mx-auto flex flex-col h-[70vh]">
             <h2 className="text-3xl font-light text-white text-center mb-4">Tarun AI Oracle</h2>
@@ -293,7 +293,7 @@ export default function TarunSpatialEngine() {
                 </div>
               ))}
             </div>
-            <form onSubmit={sendOracleMsg} className="flex gap-2">
+            <form onSubmit={handleSendOracle} className="flex gap-2">
               <input
                 type="text"
                 value={inputVal}
@@ -311,7 +311,7 @@ export default function TarunSpatialEngine() {
           </div>
         )}
 
-        {/* TAB 5: PANCHANG */}
+        {/* 5. PANCHANG */}
         {activeTab === 'panchang' && (
           <div className="max-w-3xl mx-auto space-y-6">
             <h2 className="text-3xl font-light text-white text-center">Daily Vedic Panchang</h2>
