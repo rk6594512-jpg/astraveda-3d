@@ -1,20 +1,19 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "TARUN | Cosmic 3D Intelligence 2030",
-  description:
-    "Luxury Spatial Computing Vedic Platform – Quantum Kundli, Neural Palmistry, AI Oracle, Live Panchang & Gemstone Lab.",
+  title: 'SiddhaKarm.AI — Digital Ashram & Vedic Trust',
+  description: 'Truth-First Spiritual Guidance. Eliminating Commercial Fraud. Restoring Vedic Trust.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="dark scroll-smooth">
-      <body className="antialiased bg-[#030408] text-white min-h-screen selection:bg-[#C89B3C]/30 overflow-x-hidden">
+    <html lang="hi" className="scroll-smooth">
+      <body className="bg-[#070D14] text-[#F0F4F8] antialiased min-h-screen overflow-x-hidden selection:bg-[#D4A017]/30">
         {children}
       </body>
     </html>

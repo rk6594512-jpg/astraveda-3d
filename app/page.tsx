@@ -1,749 +1,519 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef, FormEvent } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 
-/* ============================
-   TYPE DEFINITIONS
-============================ */
-type KundliData = {
-  name: string;
-  birthDate: string;
-  birthTime: string;
-  latitude: number;
-  longitude: number;
-  city: string;
-};
-
-type PlanetStrength = {
-  sun: number;
-  moon: number;
-  mars: number;
-  mercury: number;
-  jupiter: number;
-  venus: number;
-  saturn: number;
-  rahu: number;
-  ketu: number;
-};
-
-type DashaPeriod = {
-  planet: string;
-  startYear: number;
-  endYear: number;
-};
-
-type ChatMessage = {
-  role: "user" | "bot";
-  content: string;
-};
-
-/* ============================
-   ASTRONOMICAL & VEDIC UTILITIES
-============================ */
-function julianDay(date: Date): number {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  const day = date.getUTCDate() + date.getUTCHours() / 24 + date.getUTCMinutes() / 1440;
-  let y = year;
-  let m = month;
-  if (m <= 2) {
-    y -= 1;
-    m += 12;
+const translations = {
+  hi: {
+    badge_text: 'सत्य-प्रथम डिजिटल आश्रम • वैदिक चेतना',
+    hero_title: 'सिद्धकर्म — सत्य का इंजन',
+    hero_subtitle: 'प्रामाणिक गुरु-शिष्य परंपरा, तंत्र-मंत्र का सत्य और अत्याधुनिक AI गणना का संगम।',
+    btn_palm: '✋ हस्त रेखा स्कैनर',
+    btn_kundli: '🪐 वैदिक कुण्डली',
+    btn_puja: '🪔 पूजा / अनुष्ठान',
+    scroll_hint: 'नीचे स्क्रॉल करें — आश्रम में प्रवेश करें ↓',
+    parampara_title: 'गुरु-शिष्य परंपरा',
+    parampara_sub: 'व्यावसायिक धोखाधड़ी से मुक्त, निःस्वार्थ वैदिक सत्य का संकल्प।',
+    guruji_name: 'गुरुजी महाराज',
+    guruji_desc: 'साधना, तंत्र शुद्धि और आत्म-रक्षा के सिद्ध ज्ञाता। आपके जीवन से नकारात्मक ऊर्जा का समूल नाश।',
+    pandit_name: 'पंडित जी',
+    pandit_desc: 'वेद विद्यालय के आचार्य, कालसर्प, मांगलिक एवं ग्रह दोष निवारण अनुष्ठान के विशेषज्ञ।',
+    palm_title: 'हस्त रेखा विश्लेषण',
+    palm_desc: 'कैमरा खोलकर अपनी हथेली सामने लाएँ — AI आपकी ऊर्जा रेखाओं को स्कैन करेगा।',
+    palm_btn: '📷 कैमरा स्कैन शुरू करें',
+    kundli_title: 'वैदिक जन्म पत्रिका',
+    kundli_desc: 'सटीक खगोलीय गणना द्वारा अपने लग्न व नक्षत्र की गणना करें।',
+    k_name: 'पूरा नाम',
+    k_dob: 'जन्म तिथि',
+    k_tob: 'जन्म समय',
+    k_pob: 'जन्म स्थान',
+    k_btn: '🪐 कुण्डली चक्र तैयार करें',
+    puja_title: 'पूजा / अनुष्ठान बुकिंग',
+    puja_desc: 'वैदिक विधि-विधान से संपन्न होने वाले संकल्प व दोष निवारण।',
+    puja_name: 'यजमान का नाम',
+    puja_gotra: 'गोत्र (यदि ज्ञात हो)',
+    puja_type: 'अनुष्ठान प्रकार',
+    puja_date: 'संकल्प तिथि',
+    puja_btn: '🪔 संकल्प व बुकिंग पूर्ण करें',
+    footer: '© 2026 SiddhaKarm.AI — डिजिटल आश्रम • सत्य की विजय।'
+  },
+  en: {
+    badge_text: 'Truth-First Digital Ashram • Vedic Consciousness',
+    hero_title: 'SiddhaKarm — Engine of Truth',
+    hero_subtitle: 'Authentic Guru-Shishya lineage, spiritual truth and advanced ephemeris calculation.',
+    btn_palm: '✋ Palm Scanner',
+    btn_kundli: '🪐 Vedic Kundli',
+    btn_puja: '🪔 Book Puja',
+    scroll_hint: 'Scroll down — Enter the Ashram ↓',
+    parampara_title: 'Guru-Shishya Parampara',
+    parampara_sub: 'Free from commercial fraud, dedicated to pure Vedic truth.',
+    guruji_name: 'Guruji Maharaj',
+    guruji_desc: 'Master of spiritual defense, tantra cleansing and energetic restoration.',
+    pandit_name: 'Pandit Ji',
+    pandit_desc: 'Head of Ved Vidyalaya, master of Kaal Sarp, Manglik and planetary remedies.',
+    palm_title: 'Neural Palm Vision',
+    palm_desc: 'Open camera and align your palm — AI will trace your meridian nodes.',
+    palm_btn: '📷 Start Camera Scan',
+    kundli_title: 'Vedic Birth Matrix',
+    kundli_desc: 'Calculate Lagna, Moon sign and nakshatra coordinates in real time.',
+    k_name: 'Full Name',
+    k_dob: 'Date of Birth',
+    k_tob: 'Time of Birth',
+    k_pob: 'Place of Birth',
+    k_btn: '🪐 Calculate Kundli Matrix',
+    puja_title: 'Puja & Anushthan Booking',
+    puja_desc: 'Authentic Vedic rituals and remedial sankalpa by certified scholars.',
+    puja_name: 'Devotee Name',
+    puja_gotra: 'Gotra (Optional)',
+    puja_type: 'Ritual Type',
+    puja_date: 'Sankalpa Date',
+    puja_btn: '🪔 Complete Sankalp Booking',
+    footer: '© 2026 SiddhaKarm.AI — Digital Ashram • Victory of Truth.'
   }
-  const A = Math.floor(y / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + B - 1524.5;
-}
+};
 
-function computeMeanLongitudes(date: Date) {
-  const jd = julianDay(date);
-  const d = jd - 2451545.0;
-  const sunMean = (280.460 + 0.9856474 * d) % 360;
-  const moonMean = (218.316 + 13.176396 * d) % 360;
+export default function SiddhaKarmPage() {
+  const [lang, setLang] = useState<'hi' | 'en'>('hi');
+  const t = translations[lang];
 
-  return {
-    sun: sunMean < 0 ? sunMean + 360 : sunMean,
-    moon: moonMean < 0 ? moonMean + 360 : moonMean,
-  };
-}
-
-function computePanchang(date: Date) {
-  const { sun, moon } = computeMeanLongitudes(date);
-  const diff = moon - sun;
-  const tithiIndex = Math.floor(((diff % 360) + 360) % 360 / 12);
-  const tithiNames = [
-    "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi",
-    "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi",
-    "Trayodashi", "Chaturdashi", "Purnima", "Amavasya"
-  ];
-  let tithiName = tithiIndex < 15 ? tithiNames[tithiIndex] : tithiNames[tithiIndex - 15] + " (Krishna)";
-  if (tithiIndex === 14) tithiName = "Purnima";
-  if (tithiIndex === 29) tithiName = "Amavasya";
-
-  const nakshatraIndex = Math.floor(((moon % 360) + 360) % 360 / (360 / 27));
-  const nakshatras = [
-    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
-    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
-    "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
-    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta",
-    "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
-  ];
-
-  const yogaIndex = Math.floor(((sun + moon) % 360) / (360 / 27));
-  const yogas = [
-    "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
-    "Sukarma", "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva",
-    "Vyaghata", "Harshana", "Vajra", "Siddhi", "Vyatipata", "Variyana",
-    "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha", "Shukla",
-    "Brahma", "Indra", "Vaidhriti"
-  ];
-
-  const karanas = [
-    "Bava", "Balava", "Kaulava", "Taitila", "Garaja", "Vanija",
-    "Vishti", "Shakuni", "Chatushpada", "Naga", "Kimstughna"
-  ];
-  const karanaIndex = Math.floor((diff % 360) / 6) % 60;
-
-  return {
-    tithi: tithiName,
-    nakshatra: nakshatras[nakshatraIndex % 27],
-    yoga: yogas[yogaIndex % 27],
-    karana: karanas[karanaIndex % 11],
-    rahuKalam: "04:30 PM - 06:00 PM",
-    yamagandam: "01:30 PM - 03:00 PM",
-    abhijitMuhurta: "11:45 AM - 12:35 PM",
-  };
-}
-
-function getMoonSignFromDate(date: Date): number {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return (year + month * 2 + day * 3) % 12;
-}
-
-function getNakshatraFromMoonSign(moonSign: number): number {
-  return Math.floor((moonSign * 27) / 12) % 27;
-}
-
-function getLagnaFromTime(timeStr: string, dateStr: string): number {
-  const [hours, minutes] = (timeStr || "12:00").split(":").map(Number);
-  const birthDate = new Date(dateStr + "T00:00:00");
-  const sunrise = 6;
-  const diffHours = hours + (minutes || 0) / 60 - sunrise;
-  const sunSign = (birthDate.getMonth() + 1) % 12;
-  const lagna = (sunSign + Math.floor(diffHours / 2)) % 12;
-  return lagna < 0 ? lagna + 12 : lagna;
-}
-
-function generateDashas(nakshatra: number): DashaPeriod[] {
-  const planets = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
-  const years = [7, 20, 6, 10, 7, 18, 16, 19, 17];
-  const startIndex = nakshatra % 9;
-  const dashas: DashaPeriod[] = [];
-  let currentYear = 2026;
-  for (let i = 0; i < 9; i++) {
-    const idx = (startIndex + i) % 9;
-    const period = years[idx];
-    dashas.push({
-      planet: planets[idx],
-      startYear: currentYear,
-      endYear: currentYear + period,
-    });
-    currentYear += period;
-  }
-  return dashas;
-}
-
-/* ============================
-   MAIN COMPONENT
-============================ */
-export default function Home() {
-  const [activeTab, setActiveTab] = useState<"cosmos" | "kundli" | "palm" | "oracle" | "panchang" | "gemstone">("cosmos");
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const [ringRotateX, setRingRotateX] = useState(0);
-  const [ringRotateY, setRingRotateY] = useState(0);
+  // 432Hz Web Audio State
+  const [audioActive, setAudioActive] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
+  const oscRef = useRef<OscillatorNode | null>(null);
+
+  // WebRTC Camera State
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [palmResult, setPalmResult] = useState(false);
 
   // Kundli State
-  const [kundliInput, setKundliInput] = useState<KundliData>({
-    name: "",
-    birthDate: "2000-01-01",
-    birthTime: "12:00",
-    latitude: 28.6139,
-    longitude: 77.209,
-    city: "New Delhi",
-  });
-  const [kundliResult, setKundliResult] = useState<{
-    lagna: number;
-    moonSign: number;
-    nakshatra: number;
-    pada: number;
-    dashas: DashaPeriod[];
-  } | null>(null);
+  const [kundliData, setKundliData] = useState({ name: '', dob: '', tob: '', pob: '' });
+  const [chartCalculated, setChartCalculated] = useState(false);
 
-  // Palmistry State
-  const [scanning, setScanning] = useState(false);
-  const [palmResult, setPalmResult] = useState<{
-    lifeLine: number;
-    heartLine: number;
-    headLine: number;
-    apolloLine: number;
-    mounts: { jupiter: number; saturn: number; sun: number; venus: number };
-  } | null>(null);
+  // Puja Booking State
+  const [pujaData, setPujaData] = useState({ name: '', gotra: '', type: 'मांगलिक दोष निवारण', date: '' });
+  const [receipt, setReceipt] = useState<string | null>(null);
 
-  // AI Oracle State
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      role: "bot",
-      content: "✦ Welcome to TARUN AI Oracle (2030 Spatial Core). Ask about your astrological trajectory, high-leverage execution windows, or dosha remedies.",
-    },
-  ]);
-  const [chatInput, setChatInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
-  // Panchang State
-  const [panchang, setPanchang] = useState<ReturnType<typeof computePanchang> | null>(null);
-
-  // Gemstone State
-  const [planetStrength, setPlanetStrength] = useState<PlanetStrength>({
-    sun: 7,
-    moon: 6,
-    mars: 8,
-    mercury: 5,
-    jupiter: 9,
-    venus: 4,
-    saturn: 6,
-    rahu: 7,
-    ketu: 5,
-  });
+  // Particle Canvas Background
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    setPanchang(computePanchang(new Date()));
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let w = (canvas.width = window.innerWidth);
+    let h = (canvas.height = window.innerHeight);
+
+    const stars = Array.from({ length: 50 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.5 + 0.5,
+      v: Math.random() * 0.3 + 0.1
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(244, 208, 63, 0.5)';
+      stars.forEach((s) => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+        s.y += s.v;
+        if (s.y > h) s.y = 0;
+      });
+      animId = requestAnimationFrame(render);
+    };
+    render();
+
+    const handleResize = () => {
+      if (!canvas) return;
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
-  // 432Hz Sound toggle
-  useEffect(() => {
-    if (soundEnabled) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioCtx) {
-        audioCtxRef.current = new AudioCtx();
+  // 432Hz Sound Synth
+  const toggleAudio = () => {
+    if (!audioActive) {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtxRef.current = new AudioContextClass();
         const ctx = audioCtxRef.current;
         const osc = ctx.createOscillator();
-        osc.frequency.value = 432;
-        osc.type = "sine";
         const gain = ctx.createGain();
-        gain.gain.value = 0.03;
+
+        osc.frequency.setValueAtTime(432, ctx.currentTime);
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.03, ctx.currentTime);
+
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start();
-        oscillatorRef.current = osc;
+
+        oscRef.current = osc;
+        setAudioActive(true);
       }
     } else {
-      if (oscillatorRef.current) {
-        oscillatorRef.current.stop();
-        oscillatorRef.current.disconnect();
-        oscillatorRef.current = null;
+      if (oscRef.current) {
+        oscRef.current.stop();
+        oscRef.current.disconnect();
+        oscRef.current = null;
       }
       if (audioCtxRef.current) {
         audioCtxRef.current.close().catch(() => {});
         audioCtxRef.current = null;
       }
+      setAudioActive(false);
     }
-    return () => {
-      if (oscillatorRef.current) {
-        try { oscillatorRef.current.stop(); } catch(e){}
-      }
-      if (audioCtxRef.current) {
-        try { audioCtxRef.current.close(); } catch(e){}
-      }
-    };
-  }, [soundEnabled]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 24;
-    const y = (e.clientY / window.innerHeight - 0.5) * 24;
-    setRingRotateX(y);
-    setRingRotateY(x);
   };
 
-  const calculateKundli = (e: FormEvent) => {
-    e.preventDefault();
-    const lagna = getLagnaFromTime(kundliInput.birthTime, kundliInput.birthDate);
-    const moonSign = getMoonSignFromDate(new Date(kundliInput.birthDate));
-    const nakshatra = getNakshatraFromMoonSign(moonSign);
-    const pada = (nakshatra % 4) + 1;
-    const dashas = generateDashas(nakshatra);
-    setKundliResult({ lagna, moonSign, nakshatra, pada, dashas });
-  };
-
-  const startPalmScan = () => {
+  // Camera Palm Scanning
+  const startPalmScan = async () => {
     setScanning(true);
-    setPalmResult(null);
+    setPalmResult(false);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        setCameraActive(true);
+      }
+    } catch (err) {
+      console.warn('Camera sensor in simulation fallback');
+    }
+
     setTimeout(() => {
       setScanning(false);
-      setPalmResult({
-        lifeLine: 94,
-        heartLine: 88,
-        headLine: 91,
-        apolloLine: 85,
-        mounts: {
-          jupiter: 92,
-          saturn: 78,
-          sun: 89,
-          venus: 84,
-        },
-      });
-    }, 2500);
+      setPalmResult(true);
+    }, 2800);
   };
 
-  const handleSendMessage = (e?: FormEvent) => {
-    e?.preventDefault();
-    if (!chatInput.trim()) return;
-    const userMsg = chatInput.trim();
-    setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
-    setChatInput("");
-    setIsTyping(true);
-
-    setTimeout(() => {
-      let botReply = "";
-      const lower = userMsg.toLowerCase();
-      if (lower.includes("career") || lower.includes("job") || lower.includes("business")) {
-        botReply =
-          "✦ 10th House Matrix Activation:\nTransit alignment between Jupiter and Mercury indicates exceptional momentum for asymmetric technological expansion. Target execution window: Next 60 days.";
-      } else if (lower.includes("remedy") || lower.includes("dosha")) {
-        botReply =
-          "✦ Remedial Frequency Readout:\nRecite Maha Mrityunjaya Mantra (108 cycles) at sunrise. Integrate 5-mukhi Rudraksha to balance planetary nodes.";
-      } else if (lower.includes("invest") || lower.includes("wealth") || lower.includes("money")) {
-        botReply =
-          "✦ Ephemeris Timing Window:\nFavorable expansion during Shukla Paksha under Rohini Nakshatra. Avoid capital commitments during daily Rahu Kalam (4:30 PM - 6:00 PM).";
-      } else {
-        botReply =
-          `✦ Vedic Synthesis for "${userMsg}":\nYour karmic planetary axis indicates strong expansion in creative leverage. Focus on foundational systems to compound long-term vision.`;
-      }
-      setChatMessages((prev) => [...prev, { role: "bot", content: botReply }]);
-      setIsTyping(false);
-    }, 900);
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  const weakestPlanet = Object.entries(planetStrength).reduce((a, b) =>
-    a[1] < b[1] ? a : b
-  )[0];
-
-  const gemstoneRecommendations: Record<string, { stone: string; mantra: string; rudraksha: string }> = {
-    sun: { stone: "Ruby (Manik)", mantra: "Om Suryaya Namaha", rudraksha: "1-Mukhi" },
-    moon: { stone: "Pearl (Moti)", mantra: "Om Chandraya Namaha", rudraksha: "2-Mukhi" },
-    mars: { stone: "Red Coral (Moonga)", mantra: "Om Mangalaya Namaha", rudraksha: "3-Mukhi" },
-    mercury: { stone: "Emerald (Panna)", mantra: "Om Budhaya Namaha", rudraksha: "4-Mukhi" },
-    jupiter: { stone: "Yellow Sapphire (Pukhraj)", mantra: "Om Gurave Namaha", rudraksha: "5-Mukhi" },
-    venus: { stone: "Diamond (Heera)", mantra: "Om Shukraya Namaha", rudraksha: "6-Mukhi" },
-    saturn: { stone: "Blue Sapphire (Neelam)", mantra: "Om Shanicharaya Namaha", rudraksha: "7-Mukhi" },
-    rahu: { stone: "Hessonite (Gomed)", mantra: "Om Rahave Namaha", rudraksha: "8-Mukhi" },
-    ketu: { stone: "Cat's Eye (Lehsunia)", mantra: "Om Ketave Namaha", rudraksha: "9-Mukhi" },
-  };
-
-  const zodiacNames = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden font-sans pb-16" onMouseMove={handleMouseMove}>
-      
-      {/* 4K Cosmic Video Stream Background */}
-      <div className="starfield-fallback" />
-      <video
-        className="video-bg opacity-35"
-        autoPlay
-        muted
-        loop
-        playsInline
-      >
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-flying-through-a-star-field-in-outer-space-26750-large.mp4" type="video/mp4" />
-      </video>
+    <main className="relative min-h-screen">
+      <div className="ganga-waves" />
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
 
-      {/* Volumetric Cosmic Aura */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[900px] h-[500px] bg-gradient-to-b from-[#3B1F6E]/30 via-[#C89B3C]/10 to-transparent blur-[150px] pointer-events-none -z-10" />
-
-      {/* Top Floating Glass Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 py-4 bg-[#030408]/60 backdrop-blur-2xl border-b border-white/10 flex items-center justify-between">
-        <div onClick={() => setActiveTab("cosmos")} className="flex items-center gap-3 cursor-pointer group">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#C89B3C] via-[#F1CE73] to-white flex items-center justify-center text-[#030408] font-bold text-lg shadow-[0_0_25px_rgba(241,206,115,0.4)] group-hover:scale-105 transition-transform">
-            ✦
+      {/* Top Navbar */}
+      <nav className="fixed top-0 w-full z-50 bg-[#070D14]/75 backdrop-blur-xl border-b border-white/10">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <span className="text-2xl om-symbol select-none">🕉️</span>
+            <span className="font-bold text-xl tracking-wider sacred-glow text-white font-serif">SiddhaKarm</span>
+            <span className="text-[9px] px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 font-mono">2026</span>
           </div>
-          <div>
-            <div className="text-xl font-bold tracking-wider text-white flex items-center gap-2">
-              TARUN <span className="text-[9px] tracking-widest px-2 py-0.5 rounded-full bg-[#C89B3C]/20 border border-[#C89B3C]/40 text-[#F1CE73] uppercase">2030 Spatial</span>
-            </div>
-            <p className="text-[10px] tracking-widest uppercase text-[#8E8A9F]">Vedic Intelligence</p>
-          </div>
-        </div>
 
-        {/* HUD Tab Controls */}
-        <nav className="flex items-center gap-1.5 p-1 rounded-full bg-white/[0.04] border border-white/10 overflow-x-auto max-w-[60%] sm:max-w-none">
-          {(["cosmos", "kundli", "palm", "oracle", "panchang", "gemstone"] as const).map((tab) => (
+          <div className="flex items-center gap-3">
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-3 sm:px-4 py-1.5 rounded-full text-xs capitalize transition-all whitespace-nowrap ${
-                activeTab === tab
-                  ? "bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#030408] font-bold shadow-md"
-                  : "text-[#8E8A9F] hover:text-white"
+              onClick={toggleAudio}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5 ${
+                audioActive ? 'bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_15px_rgba(212,160,23,0.4)]' : 'bg-white/5 border-white/10 text-gray-300'
               }`}
             >
-              {tab === "cosmos" ? "3D Cosmos" : tab === "palm" ? "Palm Vision" : tab === "oracle" ? "AI Oracle" : tab === "gemstone" ? "Gem Lab" : tab}
+              <span>🪕</span> <span>{audioActive ? '432Hz Sound ON' : '432Hz Sound'}</span>
             </button>
-          ))}
-        </nav>
-
-        {/* 432Hz Sound Button */}
-        <button
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-            soundEnabled ? "bg-[#C89B3C] text-black border-[#F1CE73] shadow-[0_0_15px_rgba(200,155,60,0.5)]" : "bg-white/5 text-white border-white/10"
-          }`}
-        >
-          {soundEnabled ? "432Hz ON ✧" : "432Hz Sound"}
-        </button>
-      </header>
-
-      {/* Main Dynamic Viewport */}
-      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-24">
-        
-        {/* TAB 1: 3D COSMOS HERO */}
-        {activeTab === "cosmos" && (
-          <section className="flex flex-col items-center text-center pt-8 space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-[#C89B3C]/30 text-xs text-[#F1CE73] shadow-md animate-pulse">
-              <span className="w-2 h-2 rounded-full bg-[#F1CE73] shadow-[0_0_10px_#F1CE73]" />
-              <span>Next-Gen Vedic Ephemeris • 2030 Spatial Architecture</span>
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-tight text-white leading-tight max-w-4xl">
-              Destiny Computed in <br />
-              <span className="gold-text">Multidimensional Space</span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#8E8A9F] max-w-2xl leading-relaxed">
-              Autonomous Vedic calculation matrix, neural biometric palm line tracing, and real-time Jyotishi reasoning engineered for peak asymmetric leverage.
-            </p>
-
-            <div className="flex flex-wrap gap-4 justify-center items-center">
+            <div className="flex bg-white/5 p-0.5 rounded-full border border-white/10">
               <button
-                onClick={() => setActiveTab("kundli")}
-                className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#030408] font-bold shadow-[0_0_25px_rgba(241,206,115,0.35)] hover:scale-105 transition-all"
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'hi' ? 'bg-[#D4A017] text-black shadow-md' : 'text-gray-300'}`}
+                onClick={() => setLang('hi')}
               >
-                Synthesize Kundli Matrix
+                हिंदी
               </button>
               <button
-                onClick={() => setActiveTab("palm")}
-                className="px-8 py-3.5 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-white border border-[#C89B3C]/40 hover:scale-105 transition-all"
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'en' ? 'bg-[#D4A017] text-black shadow-md' : 'text-gray-300'}`}
+                onClick={() => setLang('en')}
               >
-                Launch Palm Vision
-              </button>
-              <button
-                onClick={() => setActiveTab("oracle")}
-                className="px-8 py-3.5 rounded-full bg-white/[0.03] text-[#F1CE73] border border-white/10 hover:scale-105 transition-all"
-              >
-                Consult AI Oracle
+                EN
               </button>
             </div>
+          </div>
+        </div>
+      </nav>
 
-            {/* 3D Gyroscopic Sacred Orbit */}
-            <div
-              className="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center my-6"
-              style={{
-                transform: `perspective(1000px) rotateX(${ringRotateX}deg) rotateY(${ringRotateY}deg)`,
-                transition: "transform 0.1s ease-out",
-              }}
-            >
-              <div className="absolute inset-0 rounded-full border border-[#C89B3C]/40 animate-spin-slow" />
-              <div className="absolute inset-8 rounded-full border border-[#3B1F6E]/60 border-dashed animate-spin-reverse" />
-              <div className="absolute inset-16 rounded-full border border-[#F1CE73]/30 shadow-[0_0_40px_rgba(200,155,60,0.2)]" />
-              <div className="w-24 h-24 rounded-3xl bg-[#0B0C1A]/80 border border-[#C89B3C]/50 flex items-center justify-center backdrop-blur-2xl shadow-2xl animate-float">
-                <span className="text-4xl gold-text">ॐ</span>
-              </div>
+      {/* Hero Section */}
+      <section className="relative z-10 container mx-auto px-4 pt-32 pb-16 min-h-screen flex flex-col justify-center items-center text-center">
+        <div className="text-7xl md:text-8xl om-symbol mb-2 select-none">🕉️</div>
+
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-xs text-yellow-300 mb-6 backdrop-blur-md">
+          <span>✧</span> <span>{t.badge_text}</span>
+        </div>
+
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif sacred-glow leading-tight max-w-4xl text-white">
+          {t.hero_title}
+        </h1>
+
+        <p className="text-base md:text-xl text-gray-300 mt-5 max-w-2xl font-light leading-relaxed">
+          {t.hero_subtitle}
+        </p>
+
+        <div className="flex flex-wrap gap-4 justify-center mt-10">
+          <button className="btn-gold" onClick={() => scrollTo('palm')}>{t.btn_palm}</button>
+          <button className="btn-gold" onClick={() => scrollTo('kundli')}>{t.btn_kundli}</button>
+          <button className="btn-gold" onClick={() => scrollTo('puja')}>{t.btn_puja}</button>
+        </div>
+
+        <div className="mt-16 text-xs text-gray-400 animate-bounce cursor-pointer" onClick={() => scrollTo('knowledge')}>
+          {t.scroll_hint}
+        </div>
+      </section>
+
+      {/* Guru-Shishya Parampara */}
+      <section id="knowledge" className="relative z-10 container mx-auto px-4 py-20">
+        <div className="text-center max-w-xl mx-auto mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold font-serif sacred-glow mb-3">{t.parampara_title}</h2>
+          <p className="text-sm text-gray-400">{t.parampara_sub}</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="glass-card p-8 text-center relative overflow-hidden">
+            <div className="w-28 h-28 rounded-full border-2 border-yellow-500/40 p-1 mx-auto mb-5 shadow-lg shadow-yellow-500/10">
+              <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=300&q=80" alt="Guruji" className="w-full h-full object-cover rounded-full" />
             </div>
-
-            {/* Feature Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-8 text-left">
-              <div onClick={() => setActiveTab("kundli")} className="glass-card p-6 hover:border-[#C89B3C]/60 transition-all cursor-pointer">
-                <div className="text-3xl mb-3">🪐</div>
-                <h3 className="text-lg text-[#F1CE73] mb-1 font-semibold">Quantum D1 & D9 Engine</h3>
-                <p className="text-xs text-[#8E8A9F] leading-relaxed">Precision planetary ephemeris calculating lagna degrees, nakshatras, and mahadashas.</p>
-              </div>
-              <div onClick={() => setActiveTab("palm")} className="glass-card p-6 hover:border-[#C89B3C]/60 transition-all cursor-pointer">
-                <div className="text-3xl mb-3">✋</div>
-                <h3 className="text-lg text-[#F1CE73] mb-1 font-semibold">Neural Palm Scanning</h3>
-                <p className="text-xs text-[#8E8A9F] leading-relaxed">Vision-assisted micro-line tracing of Life, Heart, and Mount nodes.</p>
-              </div>
-              <div onClick={() => setActiveTab("oracle")} className="glass-card p-6 hover:border-[#C89B3C]/60 transition-all cursor-pointer">
-                <div className="text-3xl mb-3">⚡</div>
-                <h3 className="text-lg text-[#F1CE73] mb-1 font-semibold">Tarun AI Oracle HUD</h3>
-                <p className="text-xs text-[#8E8A9F] leading-relaxed">Vedic conversational intelligence delivering strategic timing windows and remedies.</p>
-              </div>
+            <h3 className="text-2xl font-bold text-white mb-1">{t.guruji_name}</h3>
+            <p className="text-yellow-400 text-xs font-semibold uppercase tracking-wider mb-3">सिद्ध साधक • आश्रम संस्थापक</p>
+            <p className="text-gray-300 text-sm leading-relaxed mb-6">{t.guruji_desc}</p>
+            <div className="flex justify-center gap-2">
+              <span className="bg-yellow-500/15 text-yellow-300 border border-yellow-500/30 px-3 py-1 rounded-full text-xs">तंत्र शुद्धि</span>
+              <span className="bg-blue-500/15 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full text-xs">आत्म-रक्षा</span>
+              <span className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-xs">सिद्धि</span>
             </div>
-          </section>
-        )}
+          </div>
 
-        {/* TAB 2: KUNDLI MATRIX */}
-        {activeTab === "kundli" && (
-          <section className="space-y-8 animate-fadeIn">
-            <div className="text-center max-w-xl mx-auto">
-              <h2 className="text-3xl font-light text-white mb-2">Vedic Astral Matrix</h2>
-              <p className="text-xs text-[#8E8A9F]">Compute high-precision astrological coordinates across all 12 houses.</p>
+          <div className="glass-card p-8 text-center relative overflow-hidden">
+            <div className="w-28 h-28 rounded-full border-2 border-yellow-500/40 p-1 mx-auto mb-5 shadow-lg shadow-yellow-500/10">
+              <img src="https://images.unsplash.com/photo-1601233749202-95d04d5b3c00?w=300&q=80" alt="Pandit Ji" className="w-full h-full object-cover rounded-full" />
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-              <form onSubmit={calculateKundli} className="glass-card p-6 sm:p-8 space-y-4">
-                <h3 className="text-xs font-semibold text-[#F1CE73] tracking-widest uppercase">Birth Telemetry Intake</h3>
-                <div>
-                  <label className="text-xs text-[#8E8A9F] block mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={kundliInput.name}
-                    onChange={(e) => setKundliInput({ ...kundliInput, name: e.target.value })}
-                    placeholder="e.g. Tarun Chaudhary"
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#C89B3C]"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-[#8E8A9F] block mb-1">Date of Birth</label>
-                    <input
-                      type="date"
-                      required
-                      value={kundliInput.birthDate}
-                      onChange={(e) => setKundliInput({ ...kundliInput, birthDate: e.target.value })}
-                      className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#C89B3C]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-[#8E8A9F] block mb-1">Time of Birth</label>
-                    <input
-                      type="time"
-                      value={kundliInput.birthTime}
-                      onChange={(e) => setKundliInput({ ...kundliInput, birthTime: e.target.value })}
-                      className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#C89B3C]"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs text-[#8E8A9F] block mb-1">City / Coordinates</label>
-                  <input
-                    type="text"
-                    value={kundliInput.city}
-                    onChange={(e) => setKundliInput({ ...kundliInput, city: e.target.value })}
-                    placeholder="e.g. New Delhi, India"
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#C89B3C]"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#030408] font-bold shadow-md hover:opacity-95 transition-all mt-2"
-                >
-                  Synthesize Birth Matrix
-                </button>
-              </form>
-
-              {/* Kundli D1 Matrix & Dasha Bar */}
-              <div className="glass-card p-6 sm:p-8 min-h-[380px] flex flex-col justify-center items-center">
-                {kundliResult ? (
-                  <div className="w-full space-y-6 text-center animate-fadeIn">
-                    <div className="pb-3 border-b border-white/10">
-                      <h4 className="text-xl text-[#F1CE73] font-light">{kundliInput.name || "User"}&apos;s Cosmic Matrix</h4>
-                      <p className="text-xs text-[#8E8A9F]">
-                        Lagna: {zodiacNames[kundliResult.lagna]} • Moon: {zodiacNames[kundliResult.moonSign]} • Pada: {kundliResult.pada}
-                      </p>
-                    </div>
-
-                    <div className="aspect-square max-w-[260px] mx-auto border-2 border-[#C89B3C]/60 rounded-2xl grid grid-cols-3 grid-rows-3 text-xs p-2 gap-1 bg-[#090A15]">
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Sun (12)</div>
-                      <div className="border border-[#C89B3C]/50 bg-[#C89B3C]/10 rounded p-1 flex items-center justify-center text-[#F1CE73] font-bold">Lagna (1)</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Jup (2)</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Sat (11)</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center text-[#F1CE73] font-bold">D1</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Mars (3)</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Ven (10)</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Mer (9)</div>
-                      <div className="border border-white/10 rounded p-1 flex items-center justify-center">Rahu (4)</div>
-                    </div>
-
-                    {/* Dasha Progression */}
-                    <div className="text-left pt-2">
-                      <p className="text-xs text-[#F1CE73] font-semibold mb-2">Vimshottari Dasha Progression:</p>
-                      <div className="space-y-1.5 text-xs text-[#8E8A9F]">
-                        {kundliResult.dashas.slice(0, 3).map((d, i) => (
-                          <div key={i} className="flex justify-between items-center p-1.5 bg-white/[0.02] rounded-lg">
-                            <span className="text-white font-medium">{d.planet} Mahadasha</span>
-                            <span>{d.startYear} – {d.endYear}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-[#8E8A9F] space-y-2">
-                    <div className="text-4xl animate-pulse">✧</div>
-                    <p className="text-xs">Fill details to compute your real-time Vedic matrix.</p>
-                  </div>
-                )}
-              </div>
+            <h3 className="text-2xl font-bold text-white mb-1">{t.pandit_name}</h3>
+            <p className="text-yellow-400 text-xs font-semibold uppercase tracking-wider mb-3">ज्योतिषाचार्य • वेद प्रमुख</p>
+            <p className="text-gray-300 text-sm leading-relaxed mb-6">{t.pandit_desc}</p>
+            <div className="flex justify-center gap-2">
+              <span className="bg-yellow-500/15 text-yellow-300 border border-yellow-500/30 px-3 py-1 rounded-full text-xs">ज्योतिष</span>
+              <span className="bg-purple-500/15 text-purple-300 border border-purple-500/30 px-3 py-1 rounded-full text-xs">वेद विद्या</span>
+              <span className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-xs">अनुष्ठान</span>
             </div>
-          </section>
-        )}
+          </div>
+        </div>
+      </section>
 
-        {/* TAB 3: NEURAL PALM SCANNER */}
-        {activeTab === "palm" && (
-          <section className="max-w-xl mx-auto text-center space-y-6 animate-fadeIn">
-            <div>
-              <h2 className="text-3xl font-light text-white mb-1">Neural Palm Vision HUD</h2>
-              <p className="text-xs text-[#8E8A9F]">Biometric optical meridian scan with instant telemetry readout.</p>
-            </div>
+      {/* WebRTC Neural Palm Vision */}
+      <section id="palm" className="relative z-10 container mx-auto px-4 py-20">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold font-serif sacred-glow mb-2">{t.palm_title}</h2>
+          <p className="text-sm text-gray-400">{t.palm_desc}</p>
+        </div>
 
-            <div className="glass-card p-8 rounded-3xl relative overflow-hidden">
-              <div className="relative w-48 h-60 mx-auto border border-[#C89B3C]/40 rounded-2xl flex items-center justify-center mb-6 bg-[#090A15] overflow-hidden">
-                <span className="text-6xl select-none">✋</span>
-                {scanning && (
-                  <div className="absolute inset-x-0 h-1 bg-[#F1CE73] shadow-[0_0_20px_#F1CE73] animate-[bounce_1.5s_infinite] top-0" />
-                )}
-                {/* HUD Corners */}
-                <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#F1CE73]" />
-                <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#F1CE73]" />
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#F1CE73]" />
-                <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#F1CE73]" />
-              </div>
-
-              <button
-                onClick={startPalmScan}
-                disabled={scanning}
-                className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#030408] font-bold shadow-md hover:opacity-95 transition-all"
-              >
-                {scanning ? "Executing Optical Telemetry..." : "Initiate Biometric Scan"}
-              </button>
-
-              {palmResult && (
-                <div className="text-left bg-white/[0.05] p-5 rounded-2xl border border-[#C89B3C]/30 text-xs space-y-3 mt-6 animate-fadeIn">
-                  <div className="text-[#F1CE73] font-bold text-sm">✨ Biometric Readout Validated:</div>
-                  <div className="grid grid-cols-2 gap-2 text-[#AAA6BE]">
-                    <p><strong className="text-white">Life Line:</strong> {palmResult.lifeLine}% Vitality</p>
-                    <p><strong className="text-white">Heart Line:</strong> {palmResult.heartLine}% Balance</p>
-                    <p><strong className="text-white">Head Line:</strong> {palmResult.headLine}% Intellect</p>
-                    <p><strong className="text-white">Jupiter Mount:</strong> {palmResult.mounts.jupiter}% Leverage</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* TAB 4: TARUN AI ORACLE */}
-        {activeTab === "oracle" && (
-          <section className="max-w-2xl mx-auto flex flex-col h-[70vh] animate-fadeIn">
-            <h2 className="text-3xl font-light text-white text-center mb-1">Tarun AI Oracle HUD</h2>
-            <p className="text-xs text-[#8E8A9F] text-center mb-4">Conversational Vedic reasoning core powered by planetary ephemeris logic.</p>
-
-            <div className="flex-1 overflow-y-auto space-y-3 p-4 glass-card mb-4">
-              {chatMessages.map((m, idx) => (
-                <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
-                    m.role === "user" ? "bg-[#C89B3C] text-[#030408] font-semibold" : "bg-white/[0.06] text-white border border-white/10 whitespace-pre-line"
-                  }`}>
-                    {m.content}
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="text-xs text-[#F1CE73] animate-pulse">✦ Oracle synthesizing ephemeris coordinates...</div>
-              )}
-            </div>
-
-            <form onSubmit={handleSendMessage} className="flex gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask Oracle (e.g. Best timing for scaling a new venture?)..."
-                className="flex-1 bg-white/[0.05] border border-white/10 rounded-full px-5 py-3 text-white text-xs focus:outline-none focus:border-[#C89B3C]"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#F1CE73] text-[#030408] font-bold text-xs"
-              >
-                Transmit
-              </button>
-            </form>
-          </section>
-        )}
-
-        {/* TAB 5: PANCHANG */}
-        {activeTab === "panchang" && (
-          <section className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
-            <h2 className="text-3xl font-light text-white text-center mb-1">Spatial Vedic Panchang</h2>
-            <p className="text-xs text-[#8E8A9F] text-center mb-6">Real-time astronomical computation of daily muhurta windows.</p>
-
-            {panchang && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="glass-card p-6 space-y-3 text-xs">
-                  <h3 className="text-base text-[#F1CE73] font-semibold">Astronomical Telemetry</h3>
-                  <p className="flex justify-between border-b border-white/5 py-1.5"><span className="text-[#8E8A9F]">Tithi</span><span className="text-white font-medium">{panchang.tithi}</span></p>
-                  <p className="flex justify-between border-b border-white/5 py-1.5"><span className="text-[#8E8A9F]">Nakshatra</span><span className="text-white font-medium">{panchang.nakshatra}</span></p>
-                  <p className="flex justify-between border-b border-white/5 py-1.5"><span className="text-[#8E8A9F]">Yoga</span><span className="text-white font-medium">{panchang.yoga}</span></p>
-                  <p className="flex justify-between border-b border-white/5 py-1.5"><span className="text-[#8E8A9F]">Karana</span><span className="text-white font-medium">{panchang.karana}</span></p>
-                </div>
-                <div className="glass-card p-6 space-y-3 text-xs">
-                  <h3 className="text-base text-[#F1CE73] font-semibold">Muhurta Windows</h3>
-                  <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                    <span className="text-emerald-400 font-bold block">Abhijit Muhurta (Auspicious)</span>
-                    <span className="text-white">{panchang.abhijitMuhurta}</span>
-                  </div>
-                  <div className="p-3 bg-rose-500/10 rounded-xl border border-rose-500/20">
-                    <span className="text-rose-400 font-bold block">Rahu Kalam (Avoid)</span>
-                    <span className="text-white">{panchang.rahuKalam}</span>
-                  </div>
-                </div>
+        <div className="glass-card p-6 md:p-8 max-w-md mx-auto text-center relative overflow-hidden">
+          <div className="relative w-full h-72 rounded-2xl bg-[#070D14] border border-yellow-500/30 flex items-center justify-center overflow-hidden mb-6 shadow-inner">
+            <video ref={videoRef} autoPlay playsInline muted className={`w-full h-full object-cover ${cameraActive ? 'block' : 'hidden'}`} />
+            {!cameraActive && (
+              <div className="flex flex-col items-center">
+                <span className="text-6xl mb-2 select-none">✋</span>
+                <span className="text-xs text-gray-400">कैमरा सेंसर स्टैंडबाय</span>
               </div>
             )}
-          </section>
-        )}
+            {scanning && <div className="absolute inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-yellow-300 to-transparent shadow-[0_0_20px_#F4D03F] laser-scan z-10" />}
+            <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-yellow-400" />
+            <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-yellow-400" />
+            <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-yellow-400" />
+            <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-yellow-400" />
+          </div>
 
-        {/* TAB 6: GEMSTONE FREQUENCY LAB */}
-        {activeTab === "gemstone" && (
-          <section className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
-            <h2 className="text-3xl font-light text-white text-center mb-1">Gemstone Frequency Lab</h2>
-            <p className="text-xs text-[#8E8A9F] text-center mb-6">Interactive planetary strength tuner matching harmonic remedies.</p>
+          <button className="btn-gold w-full" onClick={startPalmScan} disabled={scanning}>
+            {scanning ? 'स्कैनिंग चालू है...' : t.palm_btn}
+          </button>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="glass-card p-6 space-y-3">
-                <h3 className="text-sm font-semibold text-[#F1CE73] mb-3">Planetary Strength Matrix (1 - 10)</h3>
-                {Object.entries(planetStrength).map(([planet, strength]) => (
-                  <div key={planet} className="flex items-center justify-between gap-4 text-xs">
-                    <span className="capitalize text-white w-16">{planet}</span>
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={strength}
-                      onChange={(e) => setPlanetStrength({ ...planetStrength, [planet]: Number(e.target.value) })}
-                      className="flex-1 accent-[#C89B3C]"
-                    />
-                    <span className="text-[#F1CE73] font-mono w-4">{strength}</span>
-                  </div>
-                ))}
+          {palmResult && (
+            <div className="mt-6 text-left p-4 rounded-xl bg-white/5 border border-yellow-500/30 text-xs space-y-2.5">
+              <div className="text-yellow-400 font-bold text-sm flex items-center justify-between">
+                <span>✨ रेखा विश्लेषण परिणाम:</span>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">सत्यापित</span>
               </div>
+              <p><strong className="text-white">जीवन रेखा:</strong> 94% ऊर्जा — गहरी और सुदृढ़, दीर्घायु व उच्च जीवन शक्ति।</p>
+              <p><strong className="text-white">हृदय रेखा:</strong> गुरु पर्वत की ओर झुकाव — निष्ठावान और परोपकारी स्वभाव।</p>
+              <p><strong className="text-white">भाग्य रेखा:</strong> 28 वर्ष के उपरांत प्रबल भाग्योदय एवं व्यावसायिक उन्नति।</p>
+            </div>
+          )}
+        </div>
+      </section>
 
-              <div className="glass-card p-6 flex flex-col justify-center space-y-4">
-                <h3 className="text-sm font-semibold text-[#F1CE73]">Optimal Remedial Synthesis</h3>
-                <div className="p-4 bg-white/[0.04] rounded-2xl border border-[#C89B3C]/30 space-y-2 text-xs">
-                  <p className="text-rose-400">Weakest Planet: <strong className="text-white capitalize">{weakestPlanet}</strong></p>
-                  <p className="text-white">Recommended Gemstone: <strong className="text-[#F1CE73]">{gemstoneRecommendations[weakestPlanet]?.stone}</strong></p>
-                  <p className="text-white">Harmonic Mantra: <strong className="text-[#F1CE73]">{gemstoneRecommendations[weakestPlanet]?.mantra}</strong></p>
-                  <p className="text-white">Rudraksha Pairing: <strong className="text-[#F1CE73]">{gemstoneRecommendations[weakestPlanet]?.rudraksha}</strong></p>
-                </div>
+      {/* Vedic Kundli Engine */}
+      <section id="kundli" className="relative z-10 container mx-auto px-4 py-20">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold font-serif sacred-glow mb-2">{t.kundli_title}</h2>
+          <p className="text-sm text-gray-400">{t.kundli_desc}</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-start">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (kundliData.name) setChartCalculated(true);
+            }}
+            className="glass-card p-6 md:p-8 space-y-4"
+          >
+            <div>
+              <label className="block text-xs text-gray-300 mb-1">{t.k_name}</label>
+              <input
+                type="text"
+                required
+                value={kundliData.name}
+                onChange={(e) => setKundliData({ ...kundliData, name: e.target.value })}
+                placeholder="उदा. राहुल शर्मा"
+                className="w-full px-4 py-2.5 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-sm text-white"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-300 mb-1">{t.k_dob}</label>
+                <input
+                  type="date"
+                  required
+                  value={kundliData.dob}
+                  onChange={(e) => setKundliData({ ...kundliData, dob: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-sm text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-300 mb-1">{t.k_tob}</label>
+                <input
+                  type="time"
+                  value={kundliData.tob}
+                  onChange={(e) => setKundliData({ ...kundliData, tob: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-sm text-white"
+                />
               </div>
             </div>
-          </section>
-        )}
+            <div>
+              <label className="block text-xs text-gray-300 mb-1">{t.k_pob}</label>
+              <input
+                type="text"
+                value={kundliData.pob}
+                onChange={(e) => setKundliData({ ...kundliData, pob: e.target.value })}
+                placeholder="उदा. नई दिल्ली"
+                className="w-full px-4 py-2.5 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-sm text-white"
+              />
+            </div>
+            <button type="submit" className="btn-gold w-full mt-2">{t.k_btn}</button>
+          </form>
 
-      </div>
+          <div className="glass-card p-6 min-h-[320px] flex flex-col justify-center items-center text-center">
+            {chartCalculated ? (
+              <div className="w-full space-y-4">
+                <h4 className="text-lg font-bold text-yellow-400">{kundliData.name || 'यजमान'} का लग्न चक्र (D1)</h4>
+                <p className="text-xs text-gray-300">लग्न: मेष • चंद्र राशि: वृषभ • नक्षत्र: रोहिणी</p>
+
+                <div className="w-56 h-56 mx-auto border-2 border-yellow-500/60 relative p-1 bg-black/40 shadow-lg">
+                  <svg viewBox="0 0 200 200" className="w-full h-full stroke-yellow-500/70 stroke-[1.2] fill-none">
+                    <rect x="0" y="0" width="200" height="200" />
+                    <line x1="0" y1="0" x2="200" y2="200" />
+                    <line x1="200" y1="0" x2="0" y2="200" />
+                    <polygon points="100,0 200,100 100,200 0,100" />
+                    <text x="100" y="55" textAnchor="middle" className="fill-yellow-400 text-[10px] font-bold">1st (Lagna)</text>
+                    <text x="100" y="105" textAnchor="middle" className="fill-white text-[11px] font-serif">D1 Chart</text>
+                    <text x="100" y="155" textAnchor="middle" className="fill-yellow-400 text-[10px]">7th House</text>
+                  </svg>
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-400 text-sm space-y-2">
+                <span className="text-5xl block">✧</span>
+                <p>जन्म विवरण दर्ज करें — आपका D1 लग्न चक्र यहाँ निर्मित होगा।</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Puja / Anushthan Booking */}
+      <section id="puja" className="relative z-10 container mx-auto px-4 py-20">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold font-serif sacred-glow mb-2">{t.puja_title}</h2>
+          <p className="text-sm text-gray-400">{t.puja_desc}</p>
+        </div>
+
+        <div className="glass-card p-8 max-w-lg mx-auto">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setReceipt(`🪔 शुभ संकल्प स्वीकृत: यजमान ${pujaData.name} हेतु "${pujaData.type}" अनुष्ठान पंजीकृत हुआ।`);
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-xs text-gray-300 mb-1">{t.puja_name}</label>
+              <input
+                type="text"
+                required
+                value={pujaData.name}
+                onChange={(e) => setPujaData({ ...pujaData, name: e.target.value })}
+                placeholder="आपका पूरा नाम"
+                className="w-full px-4 py-3 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-white text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-300 mb-1">{t.puja_gotra}</label>
+              <input
+                type="text"
+                value={pujaData.gotra}
+                onChange={(e) => setPujaData({ ...pujaData, gotra: e.target.value })}
+                placeholder="उदा. भारद्वाज / कश्यप"
+                className="w-full px-4 py-3 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-white text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-300 mb-1">{t.puja_type}</label>
+              <select
+                value={pujaData.type}
+                onChange={(e) => setPujaData({ ...pujaData, type: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-white text-sm"
+              >
+                <option value="मंगल दोष निवारण महापूजा">मंगल दोष निवारण महापूजा</option>
+                <option value="कालसर्प योग महाशांति">कालसर्प योग महाशांति</option>
+                <option value="महामृत्युंजय रक्षक अनुष्ठान">महामृत्युंजय रक्षक अनुष्ठान</option>
+                <option value="श्री सूक्तम लक्ष्मी अनुष्ठान">श्री सूक्तम लक्ष्मी अनुष्ठान</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-300 mb-1">{t.puja_date}</label>
+              <input
+                type="date"
+                required
+                value={pujaData.date}
+                onChange={(e) => setPujaData({ ...pujaData, date: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl bg-gray-900/60 border border-gray-700 focus:border-yellow-500 outline-none text-white text-sm"
+              />
+            </div>
+            <button type="submit" className="btn-gold w-full mt-2">{t.puja_btn}</button>
+          </form>
+
+          {receipt && (
+            <div className="mt-6 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-xs text-center space-y-2">
+              <span className="text-2xl">🕉️</span>
+              <p className="font-bold text-yellow-300">{receipt}</p>
+              <p className="text-gray-300">आश्रम के वेद विद्यालय से पंडित जी आपसे संकल्प एवं विधि हेतु संपर्क करेंगे।</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 text-center py-10 text-gray-500 text-xs border-t border-white/5">
+        <p>{t.footer}</p>
+      </footer>
     </main>
   );
 }
