@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सिद्धकर्म — Digital Ashram</title>
+    <meta name="description" content="Truth-First Spiritual Guidance. Eliminating Commercial Fraud. Restoring Vedic Trust.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #D4A017;
+            --gold-light: #F4D03F;
+            --glass-bg: rgba(255,255,255,0.08);
+            --glass-border: rgba(255,255,255,0.15);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', 'Noto Serif Devanagari', sans-serif;
+            background: linear-gradient(180deg, #0D1B2A 0%, #1B2838 50%, #2E4057 100%);
+            color: #F0F0F0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* ====== GANGA WAVES (CSS) ====== */
+        .ganga-waves {
+            position: fixed;
+            bottom: 0;
+            width: 200%;
+            height: 100px;
+            background: linear-gradient(90deg, transparent, rgba(74,144,217,0.3), transparent);
+            animation: wave 8s ease-in-out infinite;
+            z-index: 1;
+        }
+        .ganga-waves::before {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            width: 200%;
+            height: 80px;
+            background: linear-gradient(90deg, transparent, rgba(74,144,217,0.2), transparent);
+            animation: wave 6s ease-in-out infinite reverse;
+        }
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* ====== SACRED GLOW ====== */
+        .sacred-glow {
+            text-shadow: 0 0 20px rgba(212,160,23,0.6), 0 0 60px rgba(212,160,23,0.3);
+        }
+        
+        /* ====== GLASS CARD ====== */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(212,160,23,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        
+        /* ====== BUTTONS ====== */
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #1a1a1a;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(212,160,23,0.4);
+        }
+        .btn-gold:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(212,160,23,0.6);
+        }
+        
+        /* ====== NAVIGATION ====== */
+        .nav-glass {
+            background: rgba(13,27,42,0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* ====== LANGUAGE BUTTONS ====== */
+        .lang-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .lang-btn.active {
+            background: var(--gold);
+            color: black;
+        }
+        
+        /* ====== OM ANIMATION ====== */
+        .om-symbol {
+            font-size: 80px;
+            text-align: center;
+            animation: om-breathe 4s ease-in-out infinite;
+        }
+        @keyframes om-breathe {
+            0%,100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        /* ====== REVEAL ON SCROLL ====== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 768px) {
+            .om-symbol { font-size: 60px; }
+            .btn-gold { padding: 12px 24px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ganga Waves Background -->
+    <div class="ganga-waves"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav-glass fixed top-0 w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🕉️</span>
+                <span class="font-bold text-xl sacred-glow">SiddhaKarm</span>
+            </div>
+            <div class="flex gap-2">
+                <button class="lang-btn active" onclick="setLang('hi')">हिंदी</button>
+                <button class="lang-btn" onclick="setLang('en')">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="container mx-auto px-4 pt-24 pb-12 min-h-screen flex flex-col justify-center items-center text-center">
+        <div class="om-symbol">🕉️</div>
+        <h1 class="text-4xl md:text-6xl font-bold font-serif mt-4 sacred-glow" data-i18n="hero_title">सिद्धकर्म — सत्य का इंजन</h1>
+        <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-2xl" data-i18n="hero_subtitle">गुरुजी की शक्ति, AI का ज्ञान — एक साथ।</p>
+        
+        <div class="flex flex-col md:flex-row gap-4 mt-8">
+            <button class="btn-gold" onclick="scrollToSection('knowledge')" data-i18n="btn_knowledge">📿 ज्ञान लें</button>
+            <button class="btn-gold" onclick="scrollToSection('palm')" data-i18n="btn_palm">✋ हस्त रेखा</button>
+            <button class="btn-gold" onclick="scrollToSection('puja')" data-i18n="btn_puja">🪔 पूजा बुक करें</button>
+        </div>
+        
+        <div class="mt-12 text-sm text-gray-400" data-i18n="scroll_hint">नीचे स्क्रॉल करें — आश्रम में प्रवेश करें ↓</div>
+    </section>
+
+    <!-- Parampara Section -->
+    <section id="knowledge" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center sacred-glow mb-8" data-i18n="parampara_title">गुरु-शिष्य परंपरा</h2>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="glass-card p-6 reveal">
+                <div class="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4">
+                    <!-- Replace with actual Guruji photo -->
+                    <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=200&q=60" alt="Guruji" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-xl font-bold text-center" data-i18n="guruji_name">गुरुजी महाराज</h3>
+                <p class="text-gray-300 text-center mt-2 text-sm" data-i18n="guruji_desc">सिद्ध पुरुष, आश्रम के संस्थापक। तंत्र, मंत्र, रक्षा के सिद्ध साधक।</p>
+                <div class="flex justify-center gap-2 mt-4">
+                    <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-xs">सिद्ध</span>
+                    <span class="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs">तंत्र</span>
+                    <span class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">रक्षा</span>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 reveal">
+                <div class="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4">
+                    <!-- Replace with actual Pandit Ji photo -->
+                    <img src="https://images.unsplash.com/photo-1601233749202-95d04d5b3c00?w=200&q=60" alt="Pandit Ji" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-xl font-bold text-center" data-i18n="pandit_name">पंडित जी</h3>
+                <p class="text-gray-300 text-center mt-2 text-sm" data-i18n="pandit_desc">ज्योतिषाचार्य, वेद विद्यालय के प्रमुख। संकल्प, पूजा, अनुष्ठान के विशेषज्ञ।</p>
+                <div class="flex justify-center gap-2 mt-4">
+                    <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-xs">ज्योतिष</span>
+                    <span class="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs">वेद</span>
+                    <span class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">पूजा</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass-card p-6 mt-8 reveal text-center">
+            <p class="text-gray-300 italic" data-i18n="testimonial">"मैं तीन साल से डिप्रेशन में था। गुरुजी के आश्रम आया, एक महीने में ठीक हो गया।"</p>
+            <p class="mt-4 font-semibold">— राहुल शर्मा, दिल्ली</p>
+        </div>
+    </section>
+
+    <!-- Palm Vision Section -->
+    <section id="palm" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center sacred-glow mb-8" data-i18n="palm_title">हस्त रेखा विश्लेषण</h2>
+        
+        <div class="glass-card p-8 max-w-lg mx-auto text-center reveal">
+            <div class="text-6xl mb-4">✋</div>
+            <p class="text-gray-300 mb-6" data-i18n="palm_desc">अपना हाथ कैमरे के सामने रखें — AI आपकी रेखाएँ पढ़ेगा।</p>
+            <button class="btn-gold" onclick="alert('📷 Palm Vision — अभी डेमो जल्द आएगा!')" data-i18n="palm_btn">📷 स्कैन शुरू करें</button>
+        </div>
+    </section>
+
+    <!-- Puja Booking Section -->
+    <section id="puja" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center sacred-glow mb-8" data-i18n="puja_title">पूजा / अनुष्ठान बुकिंग</h2>
+        
+        <div class="glass-card p-8 max-w-lg mx-auto reveal">
+            <form onsubmit="handlePujaSubmit(event)">
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-300 mb-2" data-i18n="puja_name">नाम</label>
+                    <input type="text" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 focus:border-gold outline-none" placeholder="आपका नाम" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-300 mb-2" data-i18n="puja_type">पूजा प्रकार</label>
+                    <select class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 focus:border-gold outline-none">
+                        <option value="mangal">मंगल दोष निवारण</option>
+                        <option value="kalasarp">कालसर्प दोष</option>
+                        <option value="santaan">संतान प्राप्ति</option>
+                        <option value="tantra">तंत्र/मंत्र/रक्षा</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-300 mb-2" data-i18n="puja_date">तिथि</label>
+                    <input type="date" class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 focus:border-gold outline-none" required>
+                </div>
+                <button type="submit" class="btn-gold w-full" data-i18n="puja_btn">🪔 बुकिंग करें</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Mental Peace Emergency Section -->
+    <section id="peace" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center sacred-glow mb-8" data-i18n="peace_title">मानसिक शांति आपातकालीन मोड</h2>
+        <div class="glass-card p-8 max-w-lg mx-auto text-center reveal">
+            <p class="text-gray-300 mb-6" data-i18n="peace_desc">अगर आप तनाव, चिंता या डिप्रेशन में हैं, तो यहाँ क्लिक करें — तुरंत शांति पाएं।</p>
+            <button class="btn-gold" onclick="activateCalmMode()" data-i18n="peace_btn">🧘 शांति मोड चालू करें</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 text-gray-500 text-sm">
+        <p data-i18n="footer">© 2026 SiddhaKarm.AI — सत्य की जीत।</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        const translations = {
+            hi: {
+                hero_title: 'सिद्धकर्म — सत्य का इंजन',
+                hero_subtitle: 'गुरुजी की शक्ति, AI का ज्ञान — एक साथ।',
+                btn_knowledge: '📿 ज्ञान लें',
+                btn_palm: '✋ हस्त रेखा',
+                btn_puja: '🪔 पूजा बुक करें',
+                scroll_hint: 'नीचे स्क्रॉल करें — आश्रम में प्रवेश करें ↓',
+                parampara_title: 'गुरु-शिष्य परंपरा',
+                guruji_name: 'गुरुजी महाराज',
+                guruji_desc: 'सिद्ध पुरुष, आश्रम के संस्थापक। तंत्र, मंत्र, रक्षा के सिद्ध साधक।',
+                pandit_name: 'पंडित जी',
+                pandit_desc: 'ज्योतिषाचार्य, वेद विद्यालय के प्रमुख। संकल्प, पूजा, अनुष्ठान के विशेषज्ञ।',
+                testimonial: '"मैं तीन साल से डिप्रेशन में था। गुरुजी के आश्रम आया, एक महीने में ठीक हो गया।"',
+                palm_title: 'हस्त रेखा विश्लेषण',
+                palm_desc: 'अपना हाथ कैमरे के सामने रखें — AI आपकी रेखाएँ पढ़ेगा।',
+                palm_btn: '📷 स्कैन शुरू करें',
+                puja_title: 'पूजा / अनुष्ठान बुकिंग',
+                puja_name: 'नाम',
+                puja_type: 'पूजा प्रकार',
+                puja_date: 'तिथि',
+                puja_btn: '🪔 बुकिंग करें',
+                peace_title: 'मानसिक शांति आपातकालीन मोड',
+                peace_desc: 'अगर आप तनाव, चिंता या डिप्रेशन में हैं, तो यहाँ क्लिक करें — तुरंत शांति पाएं।',
+                peace_btn: '🧘 शांति मोड चालू करें',
+                footer: '© 2026 SiddhaKarm.AI — सत्य की जीत।'
+            },
+            en: {
+                hero_title: 'SiddhaKarm — Engine of Truth',
+                hero_subtitle: 'Guruji\'s Power, AI\'s Knowledge — Together.',
+                btn_knowledge: '📿 Get Knowledge',
+                btn_palm: '✋ Palm Reading',
+                btn_puja: '🪔 Book Puja',
+                scroll_hint: 'Scroll down — Enter the Ashram ↓',
+                parampara_title: 'Guru-Shishya Parampara',
+                guruji_name: 'Guruji Maharaj',
+                guruji_desc: 'Siddha Purush, Founder of Ashram. Master of Tantra, Mantra, Protection.',
+                pandit_name: 'Pandit Ji',
+                pandit_desc: 'Vedic Astrologer, Head of Ved Vidyalaya. Expert in Sankalp, Puja, Anushthan.',
+                testimonial: '"I was in depression for 3 years. I came to Guruji\'s ashram and healed in one month."',
+                palm_title: 'Palm Reading Analysis',
+                palm_desc: 'Place your hand in front of camera — AI will read your lines.',
+                palm_btn: '📷 Start Scanning',
+                puja_title: 'Puja / Anushthan Booking',
+                puja_name: 'Name',
+                puja_type: 'Puja Type',
+                puja_date: 'Date',
+                puja_btn: '🪔 Book Now',
+                peace_title: 'Mental Peace Emergency Mode',
+                peace_desc: 'If you are stressed, anxious, or depressed, click here — find peace instantly.',
+                peace_btn: '🧘 Activate Calm Mode',
+                footer: '© 2026 SiddhaKarm.AI — Victory of Truth.'
+            }
+        };
+
+        function setLang(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            localStorage.setItem('lang', lang);
+        }
+
+        const savedLang = localStorage.getItem('lang') || 'hi';
+        if (savedLang === 'en') {
+            setLang('en');
+        }
+
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function handlePujaSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = form.querySelector('input[type="text"]').value;
+            const type = form.querySelector('select').value;
+            alert(`🪔 धन्यवाद ${name}!\nआपकी पूजा बुकिंग (${type}) सफल हुई।\nपंडित जी जल्द संपर्क करेंगे।`);
+            form.reset();
+        }
+
+        // Calm mode: change background to soothing green, play sound (optional)
+        function activateCalmMode() {
+            document.body.style.background = 'linear-gradient(180deg, #1a3a2a, #2d5a3a)';
+            document.body.style.transition = 'background 2s';
+            alert('🧘 शांति मोड चालू हो गया है। कुछ गहरी साँसें लें। हम आपके साथ हैं।');
+        }
+    </script>
+</body>
+</html>
